@@ -1,0 +1,12 @@
+# Python virtual environment
+backend/venv/
+
+# Python cache
+__pycache__/
+*.pyc
+
+# Secret configuration
+.env
+
+# Editor settings
+.vscode/
