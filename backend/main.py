@@ -1,4 +1,5 @@
 from fastapi import FastAPI
+from pdf import router as pdf_router
 
 app = FastAPI(
     title="GovPolicy AI",
@@ -18,3 +19,10 @@ def health():
     return {
         "status": "healthy"
     }
+
+
+app.include_router(
+    pdf_router,
+    prefix="/api/v1/documents",
+    tags=["Documents"]
+)
