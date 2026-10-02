@@ -1,5 +1,6 @@
 from fastapi import APIRouter, UploadFile, File, HTTPException
 import fitz
+from chunker import chunk_pages
 
 router = APIRouter()
 
@@ -44,10 +45,13 @@ async def upload_pdf(file: UploadFile = File(...)):
 
         document.close()
 
+        chunks = chunk_pages(pages)
+
         return {
             "filename": file.filename,
             "total_pages": len(pages),
-            "pages": pages
+            "total_chunks": len(chunks),
+            "chunks": chunks
         }
 
     except Exception:
