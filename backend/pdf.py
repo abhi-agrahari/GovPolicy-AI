@@ -1,6 +1,7 @@
 from fastapi import APIRouter, UploadFile, File, HTTPException
-import fitz
+import pymupdf
 from chunker import chunk_pages
+from vector_store import store_chunks
 
 router = APIRouter()
 
@@ -33,7 +34,7 @@ async def upload_pdf(file: UploadFile = File(...)):
 
     try:
         # open the PDF from memory
-        document = fitz.open(stream=content, filetype="pdf")
+        document = pymupdf.open(stream=content, filetype="pdf")
 
         # extract text from every page
         pages = []
@@ -47,11 +48,14 @@ async def upload_pdf(file: UploadFile = File(...)):
 
         chunks = chunk_pages(pages)
 
+        stored_count = store_chunks(chunks, file.filename)
+
         return {
             "filename": file.filename,
             "total_pages": len(pages),
             "total_chunks": len(chunks),
-            "chunks": chunks
+            "stored_chunks": stored_count,
+            "message": "PDF processed and stored successfully"
         }
 
     except Exception:

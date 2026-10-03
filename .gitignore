@@ -10,3 +10,5 @@ __pycache__/
 
 # Editor settings
 .vscode/
+
+backend/qdrant_data/
