@@ -2,19 +2,44 @@ from fastapi import APIRouter
 from pydantic import BaseModel
 
 from vector_store import search_chunks
+from llm import generate_answer
 
 router = APIRouter()
 
 
-class SearchRequest(BaseModel):
+class ChatRequest(BaseModel):
     question: str
 
 
-@router.post("/search")
-def search(request: SearchRequest):
+@router.post("/chat")
+def chat(request: ChatRequest):
+    # search Qdrant for relevant policy chunks
     results = search_chunks(request.question)
+
+    # create context from the retrieved chunks
+    context = "\n\n".join(
+        f"Page {result['page']}:\n{result['text']}"
+        for result in results
+    )
+
+    # generate answer using the context and the question
+    answer = generate_answer(
+        request.question,
+        context
+    )
+
+    # return answer and sources
+    sources = [
+        {
+            "filename": result["filename"],
+            "page": result["page"],
+            "score": result["score"]
+        }
+        for result in results
+    ]
 
     return {
         "question": request.question,
-        "results": results
+        "answer": answer,
+        "sources": sources
     }

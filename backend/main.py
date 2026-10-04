@@ -31,6 +31,6 @@ app.include_router(
 
 app.include_router(
     search_router,
-    prefix="/api/v1/chat",
+    prefix="/api/v1",
     tags=["Chat"]
 )

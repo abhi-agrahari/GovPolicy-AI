@@ -7,6 +7,7 @@ __pycache__/
 
 # Secret configuration
 .env
+backend/.env
 
 # Editor settings
 .vscode/
