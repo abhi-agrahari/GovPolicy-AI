@@ -2,6 +2,7 @@ from fastapi import APIRouter, UploadFile, File, HTTPException
 import pymupdf
 from chunker import chunk_pages
 from vector_store import store_chunks
+from uuid import uuid4
 
 router = APIRouter()
 
@@ -48,9 +49,19 @@ async def upload_pdf(file: UploadFile = File(...)):
 
         chunks = chunk_pages(pages)
 
-        stored_count = store_chunks(chunks, file.filename)
+        user_id = "demo-user"
+
+        document_id = str(uuid4())
+
+        stored_count = store_chunks(
+            chunks,
+            file.filename,
+            user_id,
+            document_id
+        )
 
         return {
+            "document_id": document_id,
             "filename": file.filename,
             "total_pages": len(pages),
             "total_chunks": len(chunks),

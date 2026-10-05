@@ -2,6 +2,7 @@ from fastapi import APIRouter, HTTPException
 from pydantic import BaseModel
 import requests
 from bs4 import BeautifulSoup
+from uuid import uuid4
 
 from chunker import chunk_pages
 from vector_store import store_chunks
@@ -56,9 +57,14 @@ def scrape_website(request: ScrapeRequest):
 
     chunks = chunk_pages(pages)
 
+    user_id = "demo-user"
+    document_id = str(uuid4())
+
     stored_count = store_chunks(
         chunks,
-        request.url
+        request.url,
+        user_id,
+        document_id
     )
 
     return {

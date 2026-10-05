@@ -1,7 +1,14 @@
 from uuid import uuid4
 
 from qdrant_client import QdrantClient
-from qdrant_client.models import Distance, PointStruct, VectorParams
+from qdrant_client.models import (
+    Distance,
+    PointStruct,
+    VectorParams,
+    Filter,
+    FieldCondition,
+    MatchValue
+)
 from sentence_transformers import SentenceTransformer
 
 
@@ -28,7 +35,7 @@ def create_collection():
         )
 
 
-def store_chunks(chunks, filename):
+def store_chunks(chunks, filename, user_id, document_id):
     if not chunks:
         return 0
 
@@ -45,6 +52,8 @@ def store_chunks(chunks, filename):
                 id=str(uuid4()),
                 vector=embedding,
                 payload={
+                    "user_id": user_id,
+                    "document_id": document_id,
                     "filename": filename,
                     "page": chunk["page"],
                     "chunk": chunk["chunk"],
@@ -61,13 +70,24 @@ def store_chunks(chunks, filename):
     return len(points)
 
 
-def search_chunks(question, limit=3):
+def search_chunks(question, user_id, limit=3):
     # convert the user's question into a vector
     question_embedding = model.encode(question).tolist()
+
+    # filter to only return results for the current user
+    user_filter = Filter(
+        must=[
+            FieldCondition(
+                key="user_id",
+                match=MatchValue(value=user_id)
+            )
+        ]
+    )
 
     results = client.query_points(
         collection_name=COLLECTION_NAME,
         query=question_embedding,
+        query_filter=user_filter,
         limit=limit,
         with_payload=True
     )
@@ -75,6 +95,7 @@ def search_chunks(question, limit=3):
     return [
         {
             "score": result.score,
+            "document_id": result.payload["document_id"],
             "filename": result.payload["filename"],
             "page": result.payload["page"],
             "text": result.payload["text"]

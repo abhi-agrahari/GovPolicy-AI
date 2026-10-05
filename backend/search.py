@@ -14,7 +14,12 @@ class ChatRequest(BaseModel):
 @router.post("/chat")
 def chat(request: ChatRequest):
     # search Qdrant for relevant policy chunks
-    results = search_chunks(request.question)
+    user_id = "demo-user"
+
+    results = search_chunks(
+        request.question,
+        user_id
+    )
 
     # create context from the retrieved chunks
     context = "\n\n".join(
