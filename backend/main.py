@@ -1,6 +1,7 @@
 from fastapi import FastAPI
 from pdf import router as pdf_router
 from search import router as search_router
+from scraper import router as scraper_router
 
 app = FastAPI(
     title="GovPolicy AI",
@@ -33,4 +34,11 @@ app.include_router(
     search_router,
     prefix="/api/v1",
     tags=["Chat"]
+)
+
+
+app.include_router(
+    scraper_router,
+    prefix="/api/v1/documents",
+    tags=["Documents"]
 )
