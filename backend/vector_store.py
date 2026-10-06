@@ -104,4 +104,23 @@ def search_chunks(question, user_id, limit=3):
     ]
 
 
+def delete_document(document_id, user_id):
+    # delete all points associated with the document_id and user_id
+    client.delete(
+        collection_name=COLLECTION_NAME,
+        points_selector=Filter(
+            must=[
+                FieldCondition(
+                    key="document_id",
+                    match=MatchValue(value=document_id)
+                ),
+                FieldCondition(
+                    key="user_id",
+                    match=MatchValue(value=user_id)
+                )
+            ]
+        )
+    )
+
+
 create_collection()
