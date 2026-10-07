@@ -123,4 +123,44 @@ def delete_document(document_id, user_id):
     )
 
 
+def get_user_documents(user_id):
+    documents = {}
+
+    offset = None
+
+    # traverse through all the points in the collection to get unique document_ids for the user
+    while True:
+        records, offset = client.scroll(
+            collection_name=COLLECTION_NAME,
+            scroll_filter=Filter(
+                must=[
+                    FieldCondition(
+                        key="user_id",
+                        match=MatchValue(value=user_id)
+                    )
+                ]
+            ),
+            limit=100,
+            offset=offset,
+            with_payload=True
+        )
+
+        # process the records to extract unique document_ids and their corresponding filenames
+        for record in records:
+            payload = record.payload
+
+            document_id = payload["document_id"]
+
+            if document_id not in documents:
+                documents[document_id] = {
+                    "document_id": document_id,
+                    "filename": payload["filename"]
+                }
+
+        if offset is None:
+            break
+
+    return list(documents.values())
+
+
 create_collection()
