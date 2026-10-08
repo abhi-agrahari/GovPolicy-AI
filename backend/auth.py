@@ -49,3 +49,12 @@ async def auth_callback(request: Request):
         "user_id": user_info["sub"],
         "email": user_info["email"]
     }
+
+
+@router.get("/logout")
+async def logout(request: Request):
+    request.session.clear()
+
+    return {
+        "message": "Logout successful"
+    }
