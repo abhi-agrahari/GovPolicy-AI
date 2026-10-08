@@ -1,5 +1,7 @@
+from fastapi import Depends
 from fastapi import APIRouter
 from pydantic import BaseModel
+from dependencies import get_current_user
 
 from vector_store import search_chunks
 from llm import generate_answer
@@ -12,10 +14,8 @@ class ChatRequest(BaseModel):
 
 
 @router.post("/chat")
-def chat(request: ChatRequest):
+def chat(request: ChatRequest, user_id: str = Depends(get_current_user)):
     # search Qdrant for relevant policy chunks
-    user_id = "demo-user"
-
     results = search_chunks(
         request.question,
         user_id

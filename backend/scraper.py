@@ -1,8 +1,9 @@
-from fastapi import APIRouter, HTTPException
+from fastapi import APIRouter, HTTPException, Depends
 from pydantic import BaseModel
 import requests
 from bs4 import BeautifulSoup
 from uuid import uuid4
+from dependencies import get_current_user
 
 from chunker import chunk_pages
 from vector_store import store_chunks
@@ -15,7 +16,7 @@ class ScrapeRequest(BaseModel):
 
 
 @router.post("/scrape")
-def scrape_website(request: ScrapeRequest):
+def scrape_website(request: ScrapeRequest, user_id: str = Depends(get_current_user)):
     try:
         # make a GET request to the provided URL
         response = requests.get(
@@ -57,7 +58,6 @@ def scrape_website(request: ScrapeRequest):
 
     chunks = chunk_pages(pages)
 
-    user_id = "demo-user"
     document_id = str(uuid4())
 
     stored_count = store_chunks(

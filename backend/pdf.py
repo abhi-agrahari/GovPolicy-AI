@@ -1,14 +1,18 @@
-from fastapi import APIRouter, UploadFile, File, HTTPException
+from fastapi import APIRouter, UploadFile, File, HTTPException, Depends
 import pymupdf
 from chunker import chunk_pages
 from vector_store import store_chunks
 from uuid import uuid4
+from dependencies import get_current_user
 
 router = APIRouter()
 
 
 @router.post("/upload-pdf")
-async def upload_pdf(file: UploadFile = File(...)):
+async def upload_pdf(
+    file: UploadFile = File(...),
+    user_id: str = Depends(get_current_user)
+):
     # check file extension
     if not file.filename or not file.filename.lower().endswith(".pdf"):
         raise HTTPException(
@@ -49,7 +53,7 @@ async def upload_pdf(file: UploadFile = File(...)):
 
         chunks = chunk_pages(pages)
 
-        user_id = "demo-user"
+        user_id: str = Depends(get_current_user)
 
         document_id = str(uuid4())
 
