@@ -1,0 +1,58 @@
+.home-page {
+  min-height: 100vh;
+  background: #f5f7fb;
+}
+
+.navbar {
+  height: 70px;
+  padding: 0 40px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  background: white;
+  border-bottom: 1px solid #e5e7eb;
+}
+
+.navbar h2 {
+  margin: 0;
+}
+
+.user-section {
+  display: flex;
+  align-items: center;
+  gap: 15px;
+}
+
+.user-section span {
+  color: #555;
+}
+
+.user-section button {
+  padding: 8px 16px;
+  border: none;
+  border-radius: 6px;
+  background: #111827;
+  color: white;
+  cursor: pointer;
+}
+
+.user-section button:hover {
+  background: #374151;
+}
+
+.home-content {
+  max-width: 1000px;
+  margin: 0 auto;
+  padding: 60px 30px;
+  text-align: center;
+}
+
+.home-content h1 {
+  font-size: 36px;
+  margin-bottom: 15px;
+}
+
+.home-content p {
+  color: #666;
+  font-size: 18px;
+}
