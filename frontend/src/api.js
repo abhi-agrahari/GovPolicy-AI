@@ -53,6 +53,13 @@ export const documentApi = {
     });
   },
 
+  addWebsite(url) {
+    return request("/api/v1/documents/scrape", {
+      method: "POST",
+      body: JSON.stringify({ url }),
+    });
+  },
+
   getDocuments() {
     return request("/api/v1/documents");
   },

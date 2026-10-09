@@ -7,6 +7,8 @@ function Home() {
   const [documents, setDocuments] = useState([]);
   const [file, setFile] = useState(null);
   const [message, setMessage] = useState("");
+  const [url, setUrl] = useState("");
+  const [addingUrl, setAddingUrl] = useState(false);
 
   useEffect(() => {
     loadUser();
@@ -40,6 +42,36 @@ function Home() {
       loadDocuments();
     } catch (error) {
       setMessage(error.message);
+    }
+  };
+
+  const addWebsite = async () => {
+    if (!url.trim()) {
+      setMessage("Please enter a website URL.");
+      return;
+    }
+
+    try {
+      new URL(url);
+    } catch {
+      setMessage("Please enter a valid URL.");
+      return;
+    }
+
+    setAddingUrl(true);
+    setMessage("");
+
+    try {
+      const data = await documentApi.addWebsite(url);
+
+      setMessage(data.message);
+      setUrl("");
+
+      await loadDocuments();
+    } catch (error) {
+      setMessage(error.message);
+    } finally {
+      setAddingUrl(false);
     }
   };
 
@@ -90,6 +122,33 @@ function Home() {
 
           {file && <p>Selected: {file.name}</p>}
           {message && <p>{message}</p>}
+        </section>
+
+        {/* Website URL - next feature */}
+        <section className="card">
+          <h2>Add Website</h2>
+
+          <p>Enter a government policy webpage URL.</p>
+
+          <input
+            type="text"
+            placeholder="https://example.gov.in/policy"
+            value={url}
+            onChange={(e) => setUrl(e.target.value)}
+          />
+
+          <button onClick={addWebsite} disabled={addingUrl}>
+            {addingUrl ? "Processing..." : "Add Website"}
+          </button>
+        </section>
+
+        {/* Chat will be added here */}
+        <section className="card chat-placeholder">
+          <h2>Ask GovPolicy AI</h2>
+
+          <p>
+            Chat with your government policy documents.
+          </p>
         </section>
 
         {/* Documents */}

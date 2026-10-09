@@ -112,3 +112,19 @@ input[type="text"] {
 .chat-placeholder p {
   color: #666;
 }
+
+.card input[type="text"] {
+  width: 70%;
+  padding: 10px;
+  margin-right: 10px;
+  margin-bottom: 10px;
+  border: 1px solid #ccc;
+  border-radius: 6px;
+}
+
+@media (max-width: 600px) {
+  .card input[type="text"] {
+    width: 100%;
+    margin-right: 0;
+  }
+}
