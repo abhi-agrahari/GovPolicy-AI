@@ -1,34 +1,33 @@
-.home-page {
+.home {
   min-height: 100vh;
   background: #f5f7fb;
 }
 
+/* Navbar */
+
 .navbar {
-  height: 70px;
-  padding: 0 40px;
+  height: 65px;
+  padding: 0 30px;
+
   display: flex;
   align-items: center;
   justify-content: space-between;
+
   background: white;
-  border-bottom: 1px solid #e5e7eb;
+  border-bottom: 1px solid #ddd;
 }
 
 .navbar h2 {
   margin: 0;
 }
 
-.user-section {
-  display: flex;
-  align-items: center;
-  gap: 15px;
-}
-
-.user-section span {
+.navbar span {
+  margin-right: 15px;
   color: #555;
 }
 
-.user-section button {
-  padding: 8px 16px;
+button {
+  padding: 8px 15px;
   border: none;
   border-radius: 6px;
   background: #111827;
@@ -36,23 +35,80 @@
   cursor: pointer;
 }
 
-.user-section button:hover {
+button:hover {
   background: #374151;
 }
 
-.home-content {
-  max-width: 1000px;
-  margin: 0 auto;
-  padding: 60px 30px;
-  text-align: center;
+button:disabled {
+  background: #aaa;
+  cursor: not-allowed;
 }
 
-.home-content h1 {
-  font-size: 36px;
-  margin-bottom: 15px;
+/* Main */
+
+main {
+  max-width: 900px;
+  margin: auto;
+  padding: 40px 20px;
 }
 
-.home-content p {
+main > h1 {
+  margin-bottom: 5px;
+}
+
+.subtitle {
   color: #666;
-  font-size: 18px;
+  margin-bottom: 30px;
+}
+
+/* Cards */
+
+.card {
+  background: white;
+  padding: 25px;
+  margin-bottom: 20px;
+
+  border: 1px solid #ddd;
+  border-radius: 10px;
+}
+
+.card h2 {
+  margin-top: 0;
+}
+
+/* Inputs */
+
+input[type="text"] {
+  width: 70%;
+  padding: 10px;
+  margin-right: 10px;
+
+  border: 1px solid #ccc;
+  border-radius: 6px;
+}
+
+/* Documents */
+
+.document {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+
+  padding: 12px 0;
+  border-bottom: 1px solid #eee;
+}
+
+.document:last-child {
+  border-bottom: none;
+}
+
+/* Chat */
+
+.chat-placeholder {
+  text-align: center;
+  padding: 40px;
+}
+
+.chat-placeholder p {
+  color: #666;
 }
