@@ -70,3 +70,12 @@ export const documentApi = {
     });
   },
 };
+
+export const chatApi = {
+  ask(question) {
+    return request("/api/v1/chat", {
+      method: "POST",
+      body: JSON.stringify({ question }),
+    });
+  },
+};
