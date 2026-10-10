@@ -8,6 +8,7 @@ function Home() {
   const [user, setUser] = useState(null);
   const [documents, setDocuments] = useState([]);
   const [file, setFile] = useState(null);
+  const [addingFile, setAddingFile] = useState(false);
   const [message, setMessage] = useState("");
   const [url, setUrl] = useState("");
   const [addingUrl, setAddingUrl] = useState(false);
@@ -51,6 +52,8 @@ function Home() {
       return;
     }
 
+    setAddingFile(true);
+
     try {
       const data = await documentApi.upload(file);
 
@@ -62,6 +65,8 @@ function Home() {
       loadDocuments();
     } catch (error) {
       setMessage(error.message);
+    } finally {
+      setAddingFile(false);
     }
   };
 
@@ -153,7 +158,7 @@ function Home() {
 
         <div className="navbar-left">
           <span>{user?.email}</span>
-          <button onClick={logout}>Logout</button>
+          <button className="logout-button" onClick={logout}>Logout</button>
         </div>
       </header>
 
@@ -183,6 +188,7 @@ function Home() {
             >
               <div className="modal-header">
                 <h2>Add Knowledge</h2>
+                {message && <p className="message">{message}</p>}
                 <button
                   className="close-modal"
                   onClick={() => setShowKnowledgeDialog(false)}
@@ -202,12 +208,11 @@ function Home() {
                   onChange={(e) => setFile(e.target.files[0])}
                 />
 
-                <button onClick={uploadFile}>
-                  Upload
+                <button onClick={uploadFile} disabled={addingFile}>
+                  {addingFile ? "Processing..." : "Upload"}
                 </button>
 
                 {file && <p>Selected: {file.name}</p>}
-                {message && <p>{message}</p>}
               </section>
 
               {/* Website URL */}
@@ -240,6 +245,7 @@ function Home() {
                       <span>{document.filename}</span>
 
                       <button
+                        className="delete-button"
                         onClick={() =>
                           deleteDocument(document.document_id)
                         }
