@@ -47,30 +47,23 @@ def create_collection():
             )
         )
 
-    client.create_payload_index(
-        collection_name=COLLECTION_NAME,
-        field_name="user_id",
-        field_schema=PayloadSchemaType.KEYWORD,
-        wait=True,
-    )
-    client.create_payload_index(
-        collection_name=COLLECTION_NAME,
-        field_name="document_id",
-        field_schema=PayloadSchemaType.KEYWORD,
-        wait=True,
-    )
-    client.create_payload_index(
-        collection_name=COLLECTION_NAME,
-        field_name="content_hash",
-        field_schema=PayloadSchemaType.KEYWORD,
-        wait=True,
-    )
-    client.create_payload_index(
-        collection_name=COLLECTION_NAME,
-        field_name="source_url",
-        field_schema=PayloadSchemaType.TEXT,
-        wait=True,
-    )
+    indexes = {
+        "user_id": PayloadSchemaType.KEYWORD,
+        "document_id": PayloadSchemaType.KEYWORD,
+        "content_hash": PayloadSchemaType.KEYWORD,
+        "source_url": PayloadSchemaType.KEYWORD,
+    }
+
+    for field, schema in indexes.items():
+        try:
+            client.create_payload_index(
+                collection_name=COLLECTION_NAME,
+                field_name=field,
+                field_schema=schema,
+                wait=True,
+            )
+        except Exception as e:
+            print(f"Error creating index for field '{field}': {e}")
 
 
 
