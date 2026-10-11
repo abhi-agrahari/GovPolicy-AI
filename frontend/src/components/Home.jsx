@@ -3,13 +3,13 @@ import { authApi, documentApi, chatApi } from "../api";
 import "./Home.css";
 import ReactMarkdown from "react-markdown";
 import remarkGfm from "remark-gfm";
+import { toast } from 'react-toastify';
 
 function Home() {
   const [user, setUser] = useState(null);
   const [documents, setDocuments] = useState([]);
   const [file, setFile] = useState(null);
   const [addingFile, setAddingFile] = useState(false);
-  const [message, setMessage] = useState("");
   const [url, setUrl] = useState("");
   const [addingUrl, setAddingUrl] = useState(false);
   const [question, setQuestion] = useState("");
@@ -48,7 +48,7 @@ function Home() {
   // upload PDF functionality
   const uploadFile = async () => {
     if (!file) {
-      setMessage("Please select a PDF.");
+      toast.error("Please select a PDF.");
       return;
     }
 
@@ -57,14 +57,14 @@ function Home() {
     try {
       const data = await documentApi.upload(file);
 
-      setMessage(data.message);
+      toast.success(data.message);
       setFile(null);
 
       document.getElementById("pdf-input").value = "";
 
       loadDocuments();
     } catch (error) {
-      setMessage(error.message);
+      toast.error(error.message);
     } finally {
       setAddingFile(false);
     }
@@ -73,29 +73,28 @@ function Home() {
   // add website functionality
   const addWebsite = async () => {
     if (!url.trim()) {
-      setMessage("Please enter a website URL.");
+      toast.error("Please enter a website URL.");
       return;
     }
 
     try {
       new URL(url);
     } catch {
-      setMessage("Please enter a valid URL.");
+      toast.error("Please enter a valid URL.");
       return;
     }
 
     setAddingUrl(true);
-    setMessage("");
 
     try {
       const data = await documentApi.addWebsite(url);
 
-      setMessage(data.message);
+      toast.success(data.message);
       setUrl("");
 
       await loadDocuments();
     } catch (error) {
-      setMessage(error.message);
+      toast.error(error.message);
     } finally {
       setAddingUrl(false);
     }
@@ -104,6 +103,7 @@ function Home() {
   const deleteDocument = async (id) => {
     await documentApi.deleteDocument(id);
     loadDocuments();
+    toast.success("Document deleted successfully.");
   };
 
   const logout = async () => {
@@ -188,7 +188,6 @@ function Home() {
             >
               <div className="modal-header">
                 <h2>Add Knowledge</h2>
-                {message && <p className="message">{message}</p>}
                 <button
                   className="close-modal"
                   onClick={() => setShowKnowledgeDialog(false)}
