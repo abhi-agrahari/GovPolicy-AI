@@ -1,4 +1,7 @@
+import os
+
 from uuid import uuid4
+from dotenv import load_dotenv
 
 from qdrant_client import QdrantClient
 from qdrant_client.models import (
@@ -10,13 +13,22 @@ from qdrant_client.models import (
     MatchValue
 )
 from sentence_transformers import SentenceTransformer
-from qdrant_client.models import Filter, FieldCondition, MatchValue
+from qdrant_client.models import Filter, FieldCondition, MatchValue, PayloadSchemaType
+
+load_dotenv()
 
 
-# save Qdrant data in the qdrant_data folder
-client = QdrantClient(path="./qdrant_data")
+QDRANT_URL = os.getenv("QDRANT_URL")
+QDRANT_API_KEY = os.getenv("QDRANT_API_KEY")
+COLLECTION_NAME = os.getenv("COLLECTION_NAME")
 
-COLLECTION_NAME = "government_policies"
+# connect to Qdrant Cloud
+client = QdrantClient(
+    url=QDRANT_URL,
+    api_key=QDRANT_API_KEY,
+    timeout=60
+)
+
 
 # load the embedding model
 model = SentenceTransformer("all-MiniLM-L6-v2")
@@ -34,6 +46,32 @@ def create_collection():
                 distance=Distance.COSINE
             )
         )
+
+    client.create_payload_index(
+        collection_name=COLLECTION_NAME,
+        field_name="user_id",
+        field_schema=PayloadSchemaType.KEYWORD,
+        wait=True,
+    )
+    client.create_payload_index(
+        collection_name=COLLECTION_NAME,
+        field_name="document_id",
+        field_schema=PayloadSchemaType.KEYWORD,
+        wait=True,
+    )
+    client.create_payload_index(
+        collection_name=COLLECTION_NAME,
+        field_name="content_hash",
+        field_schema=PayloadSchemaType.KEYWORD,
+        wait=True,
+    )
+    client.create_payload_index(
+        collection_name=COLLECTION_NAME,
+        field_name="source_url",
+        field_schema=PayloadSchemaType.TEXT,
+        wait=True,
+    )
+
 
 
 def store_chunks(chunks, filename, user_id, document_id,  content_hash=None, source_url=None):
