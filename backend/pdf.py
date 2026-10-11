@@ -1,9 +1,10 @@
 from fastapi import APIRouter, UploadFile, File, HTTPException, Depends
 import pymupdf
 from chunker import chunk_pages
-from vector_store import store_chunks
+from vector_store import store_chunks, find_existing_pdf
 from uuid import uuid4
 from dependencies import get_current_user
+import hashlib
 
 router = APIRouter()
 
@@ -37,6 +38,17 @@ async def upload_pdf(
             detail="Invalid PDF file."
         )
 
+    # check for duplicate uploads by hashing the content
+    content_hash = hashlib.sha256(content).hexdigest()
+
+    existing = find_existing_pdf(user_id, content_hash)
+    
+    if existing:
+        raise HTTPException(
+            status_code=409,
+            detail="You have already uploaded this PDF."
+        )
+
     try:
         # open the PDF from memory
         document = pymupdf.open(stream=content, filetype="pdf")
@@ -59,7 +71,9 @@ async def upload_pdf(
             chunks,
             file.filename,
             user_id,
-            document_id
+            document_id,
+            content_hash,
+            None
         )
 
         return {

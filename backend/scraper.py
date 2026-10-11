@@ -4,6 +4,8 @@ import requests
 from bs4 import BeautifulSoup
 from uuid import uuid4
 from dependencies import get_current_user
+from urllib.parse import urlsplit, urlunsplit
+from vector_store import find_existing_url
 
 from chunker import chunk_pages
 from vector_store import store_chunks
@@ -15,8 +17,35 @@ class ScrapeRequest(BaseModel):
     url: str
 
 
+def normalize_url(url: str) -> str:
+    parts = urlsplit(url.strip())
+
+    return urlunsplit((
+        parts.scheme.lower(),
+        parts.netloc.lower(),
+        parts.path.rstrip("/") or "/",
+        parts.query,
+        ""
+    ))
+
+
 @router.post("/scrape")
 def scrape_website(request: ScrapeRequest, user_id: str = Depends(get_current_user)):
+    # check that the URL is valid
+    if not request.url.startswith(("http://", "https://")):
+        raise HTTPException(
+            status_code=400,
+            detail="Invalid URL. Please provide a valid URL"
+        )
+    
+    normalized_url = normalize_url(request.url)
+    existing = find_existing_url(user_id, normalized_url)
+    if existing:
+        raise HTTPException(
+            status_code=409,
+            detail="You have already scraped this website."
+        )
+    
     try:
         # make a GET request to the provided URL
         response = requests.get(
@@ -64,7 +93,9 @@ def scrape_website(request: ScrapeRequest, user_id: str = Depends(get_current_us
         chunks,
         request.url,
         user_id,
-        document_id
+        document_id,
+        None,
+        normalized_url
     )
 
     return {

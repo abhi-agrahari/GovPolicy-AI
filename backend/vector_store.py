@@ -10,6 +10,7 @@ from qdrant_client.models import (
     MatchValue
 )
 from sentence_transformers import SentenceTransformer
+from qdrant_client.models import Filter, FieldCondition, MatchValue
 
 
 # save Qdrant data in the qdrant_data folder
@@ -35,7 +36,7 @@ def create_collection():
         )
 
 
-def store_chunks(chunks, filename, user_id, document_id):
+def store_chunks(chunks, filename, user_id, document_id,  content_hash=None, source_url=None):
     if not chunks:
         return 0
 
@@ -55,6 +56,8 @@ def store_chunks(chunks, filename, user_id, document_id):
                     "user_id": user_id,
                     "document_id": document_id,
                     "filename": filename,
+                    "content_hash": content_hash,
+                    "source_url": source_url,
                     "page": chunk["page"],
                     "chunk": chunk["chunk"],
                     "text": chunk["text"]
@@ -164,3 +167,57 @@ def get_user_documents(user_id):
 
 
 create_collection()
+
+
+def find_existing_pdf(user_id: str, content_hash: str):
+    # return an existing PDF document ID if the content hash matches
+    results, _ = client.scroll(
+        collection_name=COLLECTION_NAME,
+        scroll_filter=Filter(
+            must=[
+                FieldCondition(
+                    key="user_id",
+                    match=MatchValue(value=user_id)
+                ),
+                FieldCondition(
+                    key="content_hash",
+                    match=MatchValue(value=content_hash)
+                )
+            ]
+        ),
+        limit=1,
+        with_payload=True,
+        with_vectors=False
+    )
+
+    if results:
+        return results[0].payload.get("document_id")
+
+    return None
+
+
+def find_existing_url(user_id: str, normalized_url: str):
+    # return an existing website document ID if the URL matches
+    results, _ = client.scroll(
+        collection_name=COLLECTION_NAME,
+        scroll_filter=Filter(
+            must=[
+                FieldCondition(
+                    key="user_id",
+                    match=MatchValue(value=user_id)
+                ),
+                FieldCondition(
+                    key="source_url",
+                    match=MatchValue(value=normalized_url)
+                )
+            ]
+        ),
+        limit=1,
+        with_payload=True,
+        with_vectors=False
+    )
+
+    if results:
+        return results[0].payload.get("document_id")
+
+    return None
