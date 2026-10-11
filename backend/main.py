@@ -21,7 +21,9 @@ app = FastAPI(
 
 app.add_middleware(
     SessionMiddleware,
-    secret_key=os.getenv("SESSION_SECRET")
+    secret_key=os.getenv("SESSION_SECRET"),
+    same_site="none",
+    https_only=True
 )
 
 
