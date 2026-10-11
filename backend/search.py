@@ -21,10 +21,19 @@ def chat(request: ChatRequest, user_id: str = Depends(get_current_user)):
         user_id
     )
 
+    filtered_results = [result for result in results if result['score'] > 0.4]
+
+    if len(filtered_results) == 0:
+        return {
+            "question": request.question,
+            "answer": "No relevant information found in your policies.",
+            "sources": []
+        }
+
     # create context from the retrieved chunks
     context = "\n\n".join(
         f"Page {result['page']}:\n{result['text']}"
-        for result in results
+        for result in filtered_results
     )
 
     # generate answer using the context and the question
@@ -40,7 +49,7 @@ def chat(request: ChatRequest, user_id: str = Depends(get_current_user)):
             "page": result["page"],
             "score": result["score"]
         }
-        for result in results
+        for result in filtered_results
     ]
 
     return {

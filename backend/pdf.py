@@ -53,8 +53,6 @@ async def upload_pdf(
 
         chunks = chunk_pages(pages)
 
-        user_id: str = Depends(get_current_user)
-
         document_id = str(uuid4())
 
         stored_count = store_chunks(
@@ -73,7 +71,7 @@ async def upload_pdf(
             "message": "PDF processed and stored successfully"
         }
 
-    except Exception:
+    except Exception as error:
         raise HTTPException(
             status_code=400,
             detail="Could not read the PDF."

@@ -44,11 +44,9 @@ async def auth_callback(request: Request):
     request.session["user_id"] = user_info["sub"]
     request.session["email"] = user_info["email"]
 
-    return {
-        "message": "Login successful",
-        "user_id": user_info["sub"],
-        "email": user_info["email"]
-    }
+    return RedirectResponse(
+        url=os.getenv("FRONTEND_URL")
+    )
 
 
 @router.get("/logout")
@@ -57,4 +55,21 @@ async def logout(request: Request):
 
     return {
         "message": "Logout successful"
+    }
+
+
+@router.get("/me")
+async def get_current_user(request: Request):
+    user_id = request.session.get("user_id")
+    email = request.session.get("email")
+
+    if not user_id:
+        return {
+            "authenticated": False
+        }
+
+    return {
+        "authenticated": True,
+        "user_id": user_id,
+        "email": email
     }

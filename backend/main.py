@@ -1,6 +1,7 @@
 import os
 
 from fastapi import FastAPI
+from fastapi.middleware.cors import CORSMiddleware
 from dotenv import load_dotenv
 from starlette.middleware.sessions import SessionMiddleware
 from pdf import router as pdf_router
@@ -21,6 +22,15 @@ app = FastAPI(
 app.add_middleware(
     SessionMiddleware,
     secret_key=os.getenv("SESSION_SECRET")
+)
+
+
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=[os.getenv("FRONTEND_URL")],
+    allow_credentials=True,
+    allow_methods=["*"],
+    allow_headers=["*"],
 )
 
 
